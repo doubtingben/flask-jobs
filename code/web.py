@@ -1,42 +1,13 @@
 from flask import Flask
 from flask import request, redirect, url_for
 import flask.ext.login as flask_login
+from auth import User, users, login_manager
 
 app = Flask(__name__)
 app.debug = True
 app.secret_key = 'EDREF238747828567285*^*$#%*^&(super secret string'
 
-login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
-users = {'foo@bar.tld': {'pw': 'secret'}}
-
-class User(flask_login.UserMixin):
-    pass
-
-
-@login_manager.user_loader
-def user_loader(email):
-    if email not in users:
-        return
-
-    user = User()
-    user.id = email
-    return user
-
-@login_manager.request_loader
-def request_loader(request):
-    email = request.form.get('email')
-    if email not in users:
-        return
-
-    user = User()
-    user.id = email
-
-    # DO NOT ever store passwords in plaintext and always compare password
-    # hashes using constant-time comparison!
-    user.is_authenticated = request.form['pw'] == users[email]['pw']
-
-    return user
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -eo pipefail
+
+PROJECT_DIR=/root/flask-jobs
+cd ${PROJECT_DIR}
+CURRENT_ID=$(docker ps -a -q -f "name=flask-jobs")
+if [ -n "${CURRENT_ID}" ];then
+  docker stop ${CURRENT_ID}
+  docker rm ${CURRENT_ID}
+fi
+docker build -t doubtingben/flask-jobs:dev .
+docker run -d -P --name=flask-jobs doubtingben/flask-jobs:dev
